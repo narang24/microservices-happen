@@ -1,0 +1,173 @@
+version: '3.8'
+
+services:
+  # Kafka Brokers (KRaft mode)
+  kafka-1:
+    image: bitnami/kafka:3.4.0-debian-11-r22
+    container_name: kafka-1
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9092
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9093,2@kafka-2:9093,3@kafka-3:9093
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    ports:
+      - "9094:9092"
+    volumes:
+      - kafka1_data:/bitnami/kafka
+    networks:
+      - microservices_network
+
+  kafka-2:
+    image: bitnami/kafka:3.4.0-debian-11-r22
+    container_name: kafka-2
+    environment:
+      - KAFKA_BROKER_ID=2
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_NODE_ID=2
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-2:9092
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9093,2@kafka-2:9093,3@kafka-3:9093
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    ports:
+      - "9095:9092"
+    volumes:
+      - kafka2_data:/bitnami/kafka
+    networks:
+      - microservices_network
+
+  kafka-3:
+    image: bitnami/kafka:3.4.0-debian-11-r22
+    container_name: kafka-3
+    environment:
+      - KAFKA_BROKER_ID=3
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_NODE_ID=3
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka-3:9092
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka-1:9093,2@kafka-2:9093,3@kafka-3:9093
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    ports:
+      - "9096:9092"
+    volumes:
+      - kafka3_data:/bitnami/kafka
+    networks:
+      - microservices_network
+
+  # MongoDB
+  mongo:
+    image: mongo:5
+    container_name: mongo
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - microservices_network
+
+  # Auth Service
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./auth-service/.env
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/auth-db
+      - KAFKA_BROKER=kafka-1:9092
+    depends_on:
+      - kafka-1
+      - mongo
+    networks:
+      - microservices_network
+
+  # Event Service
+  event-service:
+    build: ./event-service
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./event-service/.env
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/event-db
+      - KAFKA_BROKER=kafka-1:9092
+    depends_on:
+      - kafka-1
+      - mongo
+    networks:
+      - microservices_network
+
+  # Invitation Service
+  invitation-service:
+    build: ./invitation-service
+    ports:
+      - "8002:8002"
+    env_file:
+      - ./invitation-service/.env
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/invitation-db
+      - KAFKA_BROKER=kafka-1:9092
+    depends_on:
+      - kafka-1
+      - mongo
+    networks:
+      - microservices_network
+
+  # Status Service
+  status-service:
+    build: ./status-service
+    ports:
+      - "8003:8003"
+    env_file:
+      - ./status-service/.env
+    environment:
+      - KAFKA_BROKER=kafka-1:9092
+    depends_on:
+      - kafka-1
+    networks:
+      - microservices_network
+
+  # Kafka UI (KRaft-compatible)
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8080:8080"
+    environment:
+      - KAFKA_CLUSTERS_0_NAME=kraft-cluster
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka-1:9092,kafka-2:9092,kafka-3:9092
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    networks:
+      - microservices_network
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:stable
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - auth-service
+      - event-service
+      - invitation-service
+      - status-service
+    networks:
+      - microservices_network
+
+networks:
+  microservices_network:
+    driver: bridge
+
+volumes:
+  kafka1_data:
+  kafka2_data:
+  kafka3_data:
+  mongo_data:
