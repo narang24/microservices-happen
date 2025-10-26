@@ -12,6 +12,7 @@ router.put('/edit-event/:id', protect, editEvent);
 router.delete('/delete-event/:id', protect, deleteEvent);
 router.get('/get-recent-scheduled', protect, getRecentScheduledEvents);
 
+
 //invite-routes
 // router.post('/get-event/:id/invite', inviteEmail);
 // router.get('/get-event/:id/status', updateStatus);
