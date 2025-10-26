@@ -4,7 +4,7 @@ import { updateInvitation } from "../controllers/invitationController";
 
 const kafka = new Kafka({
     clientId: 'invitation-service',
-    brokers: ['localhost:9094','localhost:9095','localhost:9096']
+    brokers: ['kafka-1:9092','kafka-2:9092','kafka-3:9092'] 
 });
 
 const consumer = kafka.consumer({ groupId: 'invitation-service'});

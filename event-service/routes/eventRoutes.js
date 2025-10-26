@@ -1,7 +1,7 @@
 import express from 'express';
 import protect from '../middlewares/authMiddleware';
 import { addEvent, getAllEvents, getEvent, editEvent, deleteEvent, getRecentScheduledEvents } from '../controllers/eventContoller';
-const { updateStatus, inviteEmail } = require('../controllers/emailController');
+// const { updateStatus, inviteEmail } = require('../controllers/emailController');
 
 const router = express.Router();
 

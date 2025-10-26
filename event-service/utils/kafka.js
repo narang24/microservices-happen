@@ -3,7 +3,7 @@ import { updateStatus } from "../controllers/eventContoller";
 
 const kafka = new Kafka({
     clientId: 'event-service',
-    brokers: ['localhost:9094','localhost:9095','localhost:9096']
+    brokers: ['kafka-1:9092','kafka-2:9092','kafka-3:9092'] 
 });
 
 const producer = kafka.producer();
