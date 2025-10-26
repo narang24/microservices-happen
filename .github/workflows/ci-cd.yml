@@ -1,0 +1,82 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  # Job 1: Build and Test
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Build Docker images
+      run: |
+        docker-compose build
+    
+    - name: Start services
+      run: |
+        docker-compose up -d
+    
+    - name: Wait for services to be ready
+      run: |
+        sleep 30
+    
+    - name: Check services health
+      run: |
+        docker-compose ps
+        docker-compose logs
+    
+    - name: Stop services
+      run: |
+        docker-compose down
+
+  # Job 2: Push to Docker Hub (only on main branch)
+  push-to-registry:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    strategy:
+      matrix:
+        service: [auth-service, event-service, invitation-service, email-service, status-service]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+    - name: Build and push ${{ matrix.service }}
+      run: |
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/event-management-${{ matrix.service }}:latest ./${{ matrix.service }}
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/event-management-${{ matrix.service }}:latest
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/event-management-${{ matrix.service }}:${{ github.sha }} ./${{ matrix.service }}
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/event-management-${{ matrix.service }}:${{ github.sha }}
+
+  # Job 3: Success Notification
+  notify-success:
+    needs: push-to-registry
+    runs-on: ubuntu-latest
+    if: success()
+    
+    steps:
+    - name: Success message
+      run: |
+        echo "✅ CI/CD Pipeline completed successfully!"
+        echo "🐳 Docker images pushed to Docker Hub"
+        echo "📦 Images are tagged with 'latest' and commit SHA"
