@@ -1,5 +1,6 @@
 import express from "express";
 import mongoose from "mongoose";
+import cors from 'cors'
 import cron from 'node-cron';
 import eventRoutes from './routes/eventRoutes'
 import { connectToKafka } from "./utils/kafka";
