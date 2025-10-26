@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken"
 import bcrypt from 'bcrypt'
-import User from "../models/User"
-import { produceData } from "../utils/kafka"
+import User from "../models/User.js"
+import { produceData } from "../utils/kafka.js"
 
 const generateToken = (id) => {
     return jwt.sign({ id },process.env.JWT_SECRET,{ expiresIn: '1d' })

@@ -1,8 +1,8 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from 'cors'
-import authRoutes from './routes/authRoutes'
-import { connectToKafka } from "./utils/kafka";
+import authRoutes from './routes/authRoutes.js'
+import { connectToKafka } from "./utils/kafka.js";
 
 const app = express();
 
