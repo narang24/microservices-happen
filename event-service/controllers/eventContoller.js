@@ -1,6 +1,6 @@
 import axios from 'axios'
-import Event from '../models/Event';
-import { produceData } from '../utils/kafka';
+import Event from '../models/Event.js';
+import { produceData } from '../utils/kafka.js';
 
 const addEvent = async (req, res) => {
     const userId = req.user.id;

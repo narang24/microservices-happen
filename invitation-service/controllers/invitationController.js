@@ -1,4 +1,4 @@
-import Invitation from "../models/Invitation";
+import Invitation from "../models/Invitation.js";
 
 const getAllInvitations = async (req, res) => {
 

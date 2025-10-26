@@ -1,6 +1,6 @@
 import express from 'express';
-import { getAllInvitations, getInvitation, getPendingRespondedInvitations, getRecentScheduledInvitations, updateInvitation } from '../controllers/invitationController';
-import protect from '../middlewares/authMiddleware';
+import { getAllInvitations, getInvitation, getPendingRespondedInvitations, getRecentScheduledInvitations, updateInvitation } from '../controllers/invitationController.js';
+import protect from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 

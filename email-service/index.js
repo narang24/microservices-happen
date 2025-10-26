@@ -1,5 +1,5 @@
 import { Kafka } from "kafkajs";
-import sendMail from "./helpers/sendMail";
+import sendMail from "./helpers/sendMail.js";
 import jwt from "jsonwebtoken";
 
 const kafka = new Kafka({

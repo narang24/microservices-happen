@@ -1,5 +1,5 @@
 import { Kafka } from "kafkajs";
-import { updateStatus } from "../controllers/eventContoller";
+import { updateStatus } from "../controllers/eventContoller.js";
 
 const kafka = new Kafka({
     clientId: 'event-service',

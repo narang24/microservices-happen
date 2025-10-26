@@ -1,8 +1,8 @@
 import express from "express";
 import mongoose from "mongoose";
 import cors from 'cors'
-import run from "./utils/kafka";
-import invitationRoutes from './routes/invitationRoutes'
+import run from "./utils/kafka.js";
+import invitationRoutes from './routes/invitationRoutes.js'
 
 const app = express();
 

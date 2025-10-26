@@ -1,6 +1,6 @@
 import { Kafka } from "kafkajs";
-import Invitation from "../models/Invitation";
-import { updateInvitation } from "../controllers/invitationController";
+import Invitation from "../models/Invitation.js";
+import { updateInvitation } from "../controllers/invitationController.js";
 
 const kafka = new Kafka({
     clientId: 'invitation-service',

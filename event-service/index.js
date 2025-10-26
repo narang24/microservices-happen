@@ -2,9 +2,9 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from 'cors'
 import cron from 'node-cron';
-import eventRoutes from './routes/eventRoutes'
-import { connectToKafka } from "./utils/kafka";
-import { sendReminders } from "./controllers/eventContoller";
+import eventRoutes from './routes/eventRoutes.js'
+import { connectToKafka } from "./utils/kafka.js";
+import { sendReminders } from "./controllers/eventContoller.js";
 
 const app = express();
 
