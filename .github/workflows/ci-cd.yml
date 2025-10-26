@@ -22,11 +22,11 @@ jobs:
     
     - name: Build Docker images
       run: |
-        docker-compose build
+        docker compose build
     
     - name: Start services
       run: |
-        docker-compose up -d
+        docker compose up -d
     
     - name: Wait for services to be ready
       run: |
@@ -34,12 +34,12 @@ jobs:
     
     - name: Check services health
       run: |
-        docker-compose ps
-        docker-compose logs
+        docker compose ps
+        docker compose logs
     
     - name: Stop services
       run: |
-        docker-compose down
+        docker compose down
 
   # Job 2: Push to Docker Hub (only on main branch)
   push-to-registry:
