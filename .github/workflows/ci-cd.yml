@@ -19,7 +19,15 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '18'
-    
+
+    - name: Prepare env files for CI
+      run: |
+        cp event-service/.env.example event-service/.env
+        cp auth-service/.env.example auth-service/.env
+        cp invitation-service/.env.example invitation-service/.env
+        cp email-service/.env.example email-service/.env
+        cp status-service/.env.example status-service/.env
+
     - name: Build Docker images
       run: |
         docker compose build
